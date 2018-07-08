@@ -10,9 +10,11 @@ namespace ConsoleApp1
         public RunEfCore(bool isTracking)
         {
             var conneString    = ConfigReader.GetConnectionString("EfCore");
-            var optionsBuilder = new DbContextOptionsBuilder<NorthwindContext>();
-            optionsBuilder.UseSqlServer(conneString);
-            optionsBuilder.UseQueryTrackingBehavior(isTracking ? QueryTrackingBehavior.TrackAll : QueryTrackingBehavior.NoTracking);
+            var optionsBuilder = new DbContextOptionsBuilder<NorthwindContext>()
+                                         .UseSqlServer(conneString)
+                                         .UseQueryTrackingBehavior(isTracking 
+                                                                       ? QueryTrackingBehavior.TrackAll 
+                                                                       : QueryTrackingBehavior.NoTracking);
             _northwindContext = new NorthwindContext(optionsBuilder.Options);
         }
 
