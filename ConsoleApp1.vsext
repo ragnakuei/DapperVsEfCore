@@ -1,0 +1,12 @@
+{
+  "id": "2dc91119-242e-479f-92e0-0b513b47ff9a",
+  "name": "My Visual Studio extensions",
+  "description": "A collection of my Visual Studio extensions",
+  "version": "1.0",
+  "extensions": [
+    {
+      "name": "Dapper Crud Generator",
+      "vsixId": "d7261d0b-5f95-456b-9b6a-b127d9afc8e4"
+    }
+  ]
+}
