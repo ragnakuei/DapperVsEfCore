@@ -12,33 +12,33 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            //var summary = BenchmarkRunner.Run<TestRunner>();
+            var summary = BenchmarkRunner.Run<TestRunner>();
 
             #region 測試 Dapper 抓取關聯資料
 
-            var runDapper = new RunDapper();
-            var ordersInDapper = runDapper.GetOrder().ToList();
-            foreach (var order in ordersInDapper)
-            {
-                Console.WriteLine($"OrderID:{order.OrderID}");
-                Console.WriteLine($" -- CustoemrID:{order.Customer.CustomerID}");
-                Console.WriteLine($" -- ShipperID:{order.ShippedBy.ShipperID}");
-            }
+            //var runDapper = new RunDapper();
+            //var ordersInDapper = runDapper.GetOrder().ToList();
+            //foreach (var order in ordersInDapper)
+            //{
+            //    Console.WriteLine($"OrderID:{order.OrderID}");
+            //    Console.WriteLine($" -- CustoemrID:{order.Customer.CustomerID}");
+            //    Console.WriteLine($" -- ShipperID:{order.ShippedBy.ShipperID}");
+            //}
 
             #endregion
 
-            Console.WriteLine("----------------------------");
+            // Console.WriteLine("----------------------------");
 
             #region 測試 EfCore 抓取關聯資料
 
-            var runEfCore = new RunEfCore(isTracking: true);
-            var ordersInEfCore = runEfCore.GetOrder().ToList();
-            foreach (var order in ordersInEfCore)
-            {
-                Console.WriteLine($"OrderID:{order.OrderID}");
-                Console.WriteLine($" -- CustoemrID:{order.Customer.CustomerID}");
-                Console.WriteLine($" -- ShipperID:{order.ShippedBy.ShipperID}");
-            }
+            //var runEfCore = new RunEfCore(isTracking: true);
+            //var ordersInEfCore = runEfCore.GetOrder().ToList();
+            //foreach (var order in ordersInEfCore)
+            //{
+            //    Console.WriteLine($"OrderID:{order.OrderID}");
+            //    Console.WriteLine($" -- CustoemrID:{order.Customer.CustomerID}");
+            //    Console.WriteLine($" -- ShipperID:{order.ShippedBy.ShipperID}");
+            //}
 
             #endregion
 
@@ -93,9 +93,6 @@ namespace ConsoleApp1
     public class TestRunner
     {
         private readonly TestClass _test = new TestClass();
-        public TestRunner()
-        {
-        }
 
         [Benchmark]
         public void Dapper_1M_Table() => _test.Dapper_1M_Table();
