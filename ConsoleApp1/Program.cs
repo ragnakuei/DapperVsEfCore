@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Columns;
@@ -14,45 +12,78 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<TestRunner>();
+            //var summary = BenchmarkRunner.Run<TestRunner>();
 
-        //    var times = Enumerable.Range(0, 100);
-        //    var watch = new System.Diagnostics.Stopwatch();
-        //    //以上可事先宣告
+            #region 測試 Dapper 抓取關聯資料
 
-        //    var _runDapper = new RunDapper();
-        //    var _runEfCore = new RunEfCore();
+            var runDapper = new RunDapper();
+            var ordersInDapper = runDapper.GetOrder().ToList();
+            foreach (var order in ordersInDapper)
+            {
+                Console.WriteLine($"OrderID:{order.OrderID}");
+                Console.WriteLine($" -- CustoemrID:{order.Customer.CustomerID}");
+                Console.WriteLine($" -- ShipperID:{order.ShippedBy.ShipperID}");
+            }
 
-        //    do
-        //    {
-        //        watch.Restart();
-        //        //進行測試
-        //        foreach (var item in times)
-        //        {
-        //            //此處放測試的部份
-        //            _runEfCore.GetCustomer().ToList();
-        //        }
-        //        //測試結束
-        //        watch.Stop();
-        //        var elapsedMs = watch.ElapsedMilliseconds;
-        //        Console.WriteLine("Time Cost:{0}", elapsedMs);
-        //    } while (Console.ReadKey().Key != ConsoleKey.Escape);
-        //    Console.ReadLine();
+            #endregion
 
-        //    do
-        //    {
-        //        watch.Restart();
-        //        //進行測試
-        //        foreach (var item in times)
-        //        {
-        //            //此處放測試的部份
-        //            _runDapper.GetCustomer().ToList();
-        //        }
-        //        //測試結束
-        //        watch.Stop();
-        //        var elapsedMs = watch.ElapsedMilliseconds;
-        //        Console.WriteLine("Time Cost:{0}", elapsedMs);
-        //    } while (Console.ReadKey().Key != ConsoleKey.Escape);
+            Console.WriteLine("----------------------------");
+
+            #region 測試 EfCore 抓取關聯資料
+
+            var runEfCore = new RunEfCore(isTracking: true);
+            var ordersInEfCore = runEfCore.GetOrder().ToList();
+            foreach (var order in ordersInEfCore)
+            {
+                Console.WriteLine($"OrderID:{order.OrderID}");
+                Console.WriteLine($" -- CustoemrID:{order.Customer.CustomerID}");
+                Console.WriteLine($" -- ShipperID:{order.ShippedBy.ShipperID}");
+            }
+
+            #endregion
+
+
+            #region 使用傳統計時法
+
+            //    var times = Enumerable.Range(0, 100);
+            //    var watch = new System.Diagnostics.Stopwatch();
+            //    //以上可事先宣告
+
+            //    var _runDapper = new RunDapper();
+            //    var _runEfCore = new RunEfCore();
+
+            //    do
+            //    {
+            //        watch.Restart();
+            //        //進行測試
+            //        foreach (var item in times)
+            //        {
+            //            //此處放測試的部份
+            //            _runEfCore.GetCustomer().ToList();
+            //        }
+            //        //測試結束
+            //        watch.Stop();
+            //        var elapsedMs = watch.ElapsedMilliseconds;
+            //        Console.WriteLine("Time Cost:{0}", elapsedMs);
+            //    } while (Console.ReadKey().Key != ConsoleKey.Escape);
+            //    Console.ReadLine();
+
+            //    do
+            //    {
+            //        watch.Restart();
+            //        //進行測試
+            //        foreach (var item in times)
+            //        {
+            //            //此處放測試的部份
+            //            _runDapper.GetCustomer().ToList();
+            //        }
+            //        //測試結束
+            //        watch.Stop();
+            //        var elapsedMs = watch.ElapsedMilliseconds;
+            //        Console.WriteLine("Time Cost:{0}", elapsedMs);
+            //    } while (Console.ReadKey().Key != ConsoleKey.Escape);
+
+            #endregion
         }
     }
 
@@ -67,14 +98,23 @@ namespace ConsoleApp1
         }
 
         [Benchmark]
-        public void Dapper() => _test.Dapper();
+        public void Dapper_1M_Table() => _test.Dapper_1M_Table();
 
         [Benchmark]
-        public void EfCoreTracking() => _test.EfCoreTracking();
+        public void EfCore_1M_TableTracking() => _test.EfCore_1M_TableTracking();
 
         [Benchmark]
-        public void EfCoreNoTracking() => _test.EfCoreNoTracking();
+        public void EfCore_1M_TableNoTracking() => _test.EfCore_1M_TableNoTracking();
 
+
+        [Benchmark]
+        public void Dapper_1M2S_Table() => _test.Dapper_1M2S_Table();
+
+        [Benchmark]
+        public void EfCore_1M2S_TableTracking() => _test.EfCore_1M2S_TableTracking();
+
+        [Benchmark]
+        public void EfCore_1M2S_TableNoTracking() => _test.EfCore_1M2S_TableNoTracking();
     }
 
     public class TestClass
@@ -90,21 +130,39 @@ namespace ConsoleApp1
             _runEfCoreTracking = new RunEfCore(true);
         }
 
-        public IEnumerable<Customer> Dapper()
+        public IEnumerable<Customer> Dapper_1M_Table()
         {
             var result = _runDapper.GetCustomer().ToList();
             return result;
         }
 
-        public IEnumerable<Customer> EfCoreNoTracking()
+        public IEnumerable<Customer> EfCore_1M_TableNoTracking()
         {
             var result = _runEfCore.GetCustomer().ToList();
             return result;
         }
 
-        public IEnumerable<Customer> EfCoreTracking()
+        public IEnumerable<Customer> EfCore_1M_TableTracking()
         {
             var result = _runEfCoreTracking.GetCustomer().ToList();
+            return result;
+        }
+
+        public IEnumerable<Order> Dapper_1M2S_Table()
+        {
+            var result = _runDapper.GetOrder().ToList();
+            return result;
+        }
+
+        public IEnumerable<Order> EfCore_1M2S_TableTracking()
+        {
+            var result = _runEfCore.GetOrder().ToList();
+            return result;
+        }
+
+        public IEnumerable<Order> EfCore_1M2S_TableNoTracking()
+        {
+            var result = _runEfCoreTracking.GetOrder().ToList();
             return result;
         }
     }

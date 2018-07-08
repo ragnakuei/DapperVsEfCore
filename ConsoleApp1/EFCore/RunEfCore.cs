@@ -9,21 +9,23 @@ namespace ConsoleApp1
 
         public RunEfCore(bool isTracking)
         {
-            var conneString    = ConfigReader.GetConnectionString("EfCoreNoTracking");
+            var conneString    = ConfigReader.GetConnectionString("EfCore");
             var optionsBuilder = new DbContextOptionsBuilder<NorthwindContext>();
             optionsBuilder.UseSqlServer(conneString);
             optionsBuilder.UseQueryTrackingBehavior(isTracking ? QueryTrackingBehavior.TrackAll : QueryTrackingBehavior.NoTracking);
             _northwindContext = new NorthwindContext(optionsBuilder.Options);
         }
 
-        //public IEnumerable<Customer> GetCustomer()
-        //{
-        //    return _northwindContext.Customers;
-        //}
-
         public IEnumerable<Customer> GetCustomer()
         {
-            return _northwindContext.DapperCustomers;
+            return _northwindContext.Customers;
+        }
+
+        public IEnumerable<Order> GetOrder()
+        {
+            return _northwindContext.Orders
+                                    .Include(o=>o.Customer)
+                                    .Include(o=>o.ShippedBy);
         }
     }
 }
